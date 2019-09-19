@@ -1,7 +1,10 @@
 import os
 from os.path import join, getsize
 
-
+import uuid
+def get_mac_address():
+    mac=uuid.UUID(int = uuid.getnode()).hex[-12:]
+    return ":".join([mac[e:e+2] for e in range(0,11,2)])
 
 # 返回指定目录的大小
 def getdirsize(dir):
@@ -27,6 +30,12 @@ if __name__ == '__main__':
     print(os.path.getctime('./OSDemo.py')) # 得到文件的创建时间
     print(os.path.getmtime('./OSDemo.py')) #得到文件的修改时间
     print(str(getdirsize('D:\学习资料')/1024/1024/1024) + 'KB')
+
+    print(get_mac_address())
+
+
+
+
 
 __author__ = 'weiran'
 import os
