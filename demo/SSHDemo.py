@@ -12,25 +12,25 @@ import datetime
 import time
 import paramiko  # 导入paramiko
 
-hostname = "10.0.47.123"
-username = "admin"
-password = "Uni@sec123"
-cmdList = ['ipconfig']
+# hostname = "10.0.47.123"
+# username = "admin"
+# password = "Uni@sec123"
+# cmdList = ['ipconfig']
 
 hostname = "192.168.253.135"
 username = "gaolinfang"
 password = "000"
 cmdList = ['net user gaolinfang 000']
 
-hostname = "10.0.47.111"
-username = "user"
-password = "Uni@sec66998"
-cmdList = ['ipconfig']
+# hostname = "10.0.47.111"
+# username = "user"
+# password = "Uni@sec66998"
+# cmdList = ['ipconfig']
 
-hostname = "10.0.47.124"
-username = "user"
-password = "Uni@sec66998"
-cmdList = ['dir']
+# hostname = "10.0.47.124"
+# username = "user"
+# password = "Uni@sec66998"
+# cmdList = ['dir']
 
 # 第二种ssh连接执行指令方式
 def sshRunCmd2(hostname, username, password, cmdList):
