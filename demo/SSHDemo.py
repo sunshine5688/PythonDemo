@@ -5,32 +5,36 @@
 # date  : 2019/7/17
 ################################################
 
-import os
-import sys
-import string
 import datetime
-import time
 import paramiko  # 导入paramiko
 
-# hostname = "10.0.47.123"
-# username = "admin"
-# password = "Uni@sec123"
-# cmdList = ['ipconfig']
+hostname = "10.0.47.123"
+username = "admin"
+password = "Uni@sec123"
+cmdList = ['chcp 437','net user admin Uni@sec123']
+cmdList = ['net user admin Uni@sec123']
 
-hostname = "192.168.253.135"
-username = "gaolinfang"
-password = "000"
-cmdList = ['net user gaolinfang 000']
+# hostname = "192.168.253.135"
+# username = "gaolinfang"
+# password = "123"
+# cmdList = ['net user gaolinfang 123']
 
 # hostname = "10.0.47.111"
 # username = "user"
 # password = "Uni@sec66998"
-# cmdList = ['ipconfig']
+# cmdList = ['chcp 437','ipconfig']
 
 # hostname = "10.0.47.124"
 # username = "user"
 # password = "Uni@sec66998"
 # cmdList = ['dir']
+
+# linux
+hostname = "10.0.43.198"
+username = "root"
+password = "ROOTgaolinfang"
+cmdList = ['echo root:Rootgaolinfang|chpasswd']
+# echo testuser:password|chpasswd
 
 # 第二种ssh连接执行指令方式
 def sshRunCmd2(hostname, username, password, cmdList):
@@ -42,9 +46,12 @@ def sshRunCmd2(hostname, username, password, cmdList):
         # 执行指令
         for cmd in cmdList:
             stdin, stdout, stderr = client.exec_command(cmd)
+            errors = stderr.read();
+            errors = errors.decode('GBK', "ignore")
             result = stdout.read()
             result = result.decode('GBK', "ignore")
-            print(result)
+            print("errors : " + errors)
+            print("result : " + result)
     except Exception as e:
         print("[%s] %s target failed, the reason is %s" % (datetime.datetime.now(), hostname, str(e)))
     else:
@@ -52,10 +59,34 @@ def sshRunCmd2(hostname, username, password, cmdList):
     finally:
         client.close()
 
+# 修改windows密码
+def modifyWinPasswd(hostIp, port,  adminName, adminPasswd, userName, userPasswd):
+    try:
+        client = paramiko.SSHClient()
+        client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+        # 创建ssh连接
+        client.connect(hostname=hostIp, port=port, username=adminName, password=adminPasswd)
+        # 修改英文返回
+        client.exec_command('chcp 437')
+        # 执行指令
+        cmd = 'net user ' + userName + ' ' + userPasswd
+        stdin, stdout, stderr = client.exec_command(cmd)
+        errors = stderr.read()
+        errors = errors.decode('GBK', "ignore")
+        result = stdout.read()
+        result = result.decode('GBK', "ignore")
+        print("errors: " + errors)
+        print("result: " + result)
+    except Exception as e:
+        print("[%s] %s target failed, the reason is %s" % (datetime.datetime.now(), hostIp, str(e)))
+    else:
+        print("[%s] %s target success" % (datetime.datetime.now(), hostIp))
+    finally:
+        client.close()
 
 if __name__ == '__main__':
-    sshRunCmd2(hostname, username, password, cmdList)
-
+    # sshRunCmd2(hostname, username, password, cmdList)
+    modifyWinPasswd('10.0.47.123', 22, 'admin', 'Uni@sec123', 'admin', 'Uni@sec123')
 
 
 # https://gsf-fl.softonic.com/258/665/d8e2a640359f63c9f4dc3b70dccfaa3c50/file?Expires=1571851822&Signature=6d2307d881d5060fa51dccd3a7258a6e78b850d0&SD_used=&channel=WEB&fdh=no&id_file=0973b12a-96d8-11e6-b284-00163ec9f5fa&instance=softonic_en&type=PROGRAM&url=https://openssh.en.softonic.com&Filename=setupssh.exe
