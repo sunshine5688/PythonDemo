@@ -2,9 +2,9 @@ import csv
 
 def create_csv():
     path = "aa.csv"
-    with open(path,'a+',newline='') as f:
+    with open(path,'w',newline='') as f:
         csv_write = csv.writer(f)
-        data_row = ["1","2"]
+        data_row = ["1","4"]
         csv_write.writerow(data_row)
         data_row = ["2", "3"]
         csv_write.writerow(data_row)

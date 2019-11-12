@@ -8,11 +8,11 @@
 import datetime
 import paramiko  # 导入paramiko
 
-hostname = "10.0.47.123"
-username = "admin"
-password = "Uni@sec123"
-cmdList = ['chcp 437','net user admin Uni@sec123']
-cmdList = ['net user admin Uni@sec123']
+# hostname = "10.0.47.123"
+# username = "admin"
+# password = "2>Y8Jo;l"
+# cmdList = ['chcp 437','net user admin 2>Y8Jo;l']
+# cmdList = ['net user admin 2>Y8Jo;l']
 
 # hostname = "192.168.253.135"
 # username = "gaolinfang"
@@ -58,11 +58,11 @@ def sshRunCmd2(hostname, username, password, cmdList):
             print("errors : " + errors)
             print("result : " + result)
             if ('' != errors.strip()):
-                print('hostIp : ' + hostname + '改密失败-' + errors)
+                print(errors)
             print('改密成功')
     except Exception as e:
         print("[%s] %s target failed, the reason is %s" % (datetime.datetime.now(), hostname, str(e)))
-        print('hostIp : ' + hostname + '改密失败-' + str(e))
+        print(str(e))
     else:
         print("[%s] %s target success" % (datetime.datetime.now(), hostname))
     finally:
@@ -87,7 +87,7 @@ def modifyWinPasswd(hostIp, port,  adminName, adminPasswd, userName, userPasswd)
         print("errors: " + errors)
         print("result: " + result)
         if ('' != errors.strip() or 'The command completed successfully.' != result.strip()):
-            print('hostIp : ' + hostIp + '改密失败-' + errors)
+            print(errors)
         print('改密成功')
     except Exception as e:
         print("[%s] %s target failed, the reason is %s" % (datetime.datetime.now(), hostIp, str(e)))
@@ -97,11 +97,64 @@ def modifyWinPasswd(hostIp, port,  adminName, adminPasswd, userName, userPasswd)
     finally:
         client.close()
 
+
+# 通过ssh修改密码
+def modify_pwd(hostIp, port,osType, adminName, adminPasswd, userName, userPasswd):
+    try:
+        client = paramiko.SSHClient()
+        client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+        # 创建ssh连接
+        client.connect(hostname=hostIp, port=port, username=adminName, password=adminPasswd, auth_timeout=3)
+        if(osType == 'Windows'):
+            # 修改英文返回
+            client.exec_command('chcp 437')
+            # 执行指令
+            cmd = 'net user ' + userName + ' ' + userPasswd
+            stdin, stdout, stderr = client.exec_command(cmd)
+            errors = stderr.read()
+            errors = errors.decode('GBK', "ignore")
+            result = stdout.read()
+            result = result.decode('GBK', "ignore")
+            # 失败重发一次
+            if ('' != errors.strip() or 'The command completed successfully.' != result.strip()):
+                stdin, stdout, stderr = client.exec_command(cmd)
+                errors = stderr.read()
+                errors = errors.decode('GBK', "ignore")
+                result = stdout.read()
+                result = result.decode('GBK', "ignore")
+            if ('' != errors.strip() or 'The command completed successfully.' != result.strip()):
+                return errors
+        elif(osType == 'Linux'):
+            # 执行指令
+            cmd = 'echo ' + userName + ':' + userPasswd + '|chpasswd'
+            stdin, stdout, stderr = client.exec_command(cmd)
+            errors = stderr.read()
+            errors = errors.decode('GBK', "ignore")
+            # 失败重发
+            if ('' != errors.strip()):
+                stdin, stdout, stderr = client.exec_command(cmd)
+                errors = stderr.read()
+                errors = errors.decode('GBK', "ignore")
+            if ('' != errors.strip()):
+                return errors
+        return 'success'
+    except TimeoutError as e:
+        print('连接超时')
+        print(str(e))
+    except Exception as e:
+        print(type(e))
+        print("[%s] %s target failed, the reason is %s" % (datetime.datetime.now(), hostIp, str(e)))
+        return str(e);
+    finally:
+        client.close()
+
 if __name__ == '__main__':
-    sshRunCmd2(hostname, username, password, cmdList)
-    modifyWinPasswd('10.0.47.123', 22, 'admin', 'Uni@sec1234', 'admin', 'Uni@sec123')
-
-
+    # sshRunCmd2(hostname, username, password, cmdList)
+    # result = modify_pwd('10.0.47.123', 22, 'Windows', 'Administrator', 'Uni@sec123', 'admin', 'Uni@sec123')
+    result = modify_pwd('10.0.47.123', 22, 'Windows', 'Administrator', 'uni@sec2019', 'admin', 'uni@sec2019')
+    print('****************************')
+    print(result)
+    print('****************************')
 # https://gsf-fl.softonic.com/258/665/d8e2a640359f63c9f4dc3b70dccfaa3c50/file?Expires=1571851822&Signature=6d2307d881d5060fa51dccd3a7258a6e78b850d0&SD_used=&channel=WEB&fdh=no&id_file=0973b12a-96d8-11e6-b284-00163ec9f5fa&instance=softonic_en&type=PROGRAM&url=https://openssh.en.softonic.com&Filename=setupssh.exe
 # https://en.softonic.com/download/openssh/windows/post-download
 
