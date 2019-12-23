@@ -10,3 +10,13 @@ for i in range(scale + 1):
     print("\r{:^3.0f}%[{}->{}]{:.2f}s".format(c,a,b,dur),end = "")
     time.sleep(0.1)
 print("\n"+"执行结束".center(scale // 2,"-"))
+
+
+import time
+
+print("---RUNOOB EXAMPLE ： Loading 效果---")
+
+print("Loading",end = "")
+for i in range(20):
+    print(".",end = '',flush = True)
+    time.sleep(0.5)
